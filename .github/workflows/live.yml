@@ -1,0 +1,14 @@
+name: 24x7 Live
+on:
+  workflow_dispatch:
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - name: Install Tools
+        run: sudo apt update && sudo apt install -y ffmpeg && pip install yt-dlp
+      - name: Start Live
+        run: |
+          yt-dlp -o video.mp4 "${{ secrets.VIDEO }}"
+          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v libx264 -preset veryfast -b:v 2500k -maxrate 2500k -bufsize 5000k -c:a aac -b:a 128k -f flv rtmp://a.rtmp.youtube.com/live2/${{ secrets.KEY }}
